@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>maven-shade-quickstart</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.7.4.2</version>
+        </dependency>
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+<!--                            将第三方依赖jar也打到最终的jar中-->
+                            <artifactSet>
+                                <includes>
+                                    <include>com.amazonaws:**</include>
+                                    <include>org.apache.httpcomponents:**</include>
+                                </includes>
+                            </artifactSet>
+
+<!--                            在最终的jar里排除依赖第三方jar里的的类-->
+                            <filters>
+                                <filter>
+                                    <artifact>com.amazonaws:aws-java-sdk</artifact>
+                                    <excludes>
+                                        <exclude>com/amazonaws/services/s3/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+
+<!--                            重命名最终jar里的package，依赖这些package的类在引用时也会改成shade后的package-->
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.http</pattern>
+                                    <shadedPattern>shaded.org.apache.http</shadedPattern>
+                                    <excludes>
+                                        <exclude>org.apache.http.Consts</exclude>
+                                        <exclude>org.apache.http.io.*</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>org.apache.http.*</include>
+                                    </includes>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>
